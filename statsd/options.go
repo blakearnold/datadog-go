@@ -18,6 +18,7 @@ var (
 	defaultSenderQueueSize              = 0
 	defaultWriteTimeout                 = 100 * time.Millisecond
 	defaultConnectTimeout               = 1000 * time.Millisecond
+	defaultUDPAddrRefreshRate           = 0 * time.Second
 	defaultTelemetry                    = true
 	defaultReceivingMode                = mutexMode
 	defaultChannelModeBufferSize        = 4096
@@ -43,6 +44,7 @@ type Options struct {
 	senderQueueSize              int
 	writeTimeout                 time.Duration
 	connectTimeout               time.Duration
+	udpAddrRefreshRate           time.Duration
 	telemetry                    bool
 	receiveMode                  receivingMode
 	channelModeBufferSize        int
@@ -71,6 +73,7 @@ func resolveOptions(options []Option) (*Options, error) {
 		senderQueueSize:              defaultSenderQueueSize,
 		writeTimeout:                 defaultWriteTimeout,
 		connectTimeout:               defaultConnectTimeout,
+		udpAddrRefreshRate:           defaultUDPAddrRefreshRate,
 		telemetry:                    defaultTelemetry,
 		receiveMode:                  defaultReceivingMode,
 		channelModeBufferSize:        defaultChannelModeBufferSize,
@@ -438,6 +441,16 @@ func WithAggregatorShardCount(shardCount int) Option {
 			return fmt.Errorf("shardCount must be a positive integer")
 		}
 		o.aggregatorShardCount = shardCount
+		return nil
+	}
+}
+
+// WithUDPAddrRefreshRate sets the interval at which the client refreshes the UDP address.
+// This is useful when using the Agent's address may change during deployments without a fixed IP.
+// A value of 0 disables the refresh.
+func WithUDPAddrRefreshRate(rate time.Duration) Option {
+	return func(o *Options) error {
+		o.udpAddrRefreshRate = rate
 		return nil
 	}
 }

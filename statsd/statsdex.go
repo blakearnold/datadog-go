@@ -381,7 +381,7 @@ func parseAgentURL(agentURL string) string {
 	return ""
 }
 
-func createWriter(addr string, writeTimeout time.Duration, connectTimeout time.Duration) (Transport, string, error) {
+func createWriter(addr string, writeTimeout time.Duration, connectTimeout time.Duration, udpAddrRefreshRate time.Duration) (Transport, string, error) {
 	if addr == "" {
 		return nil, "", errors.New("No address passed and autodetection from environment failed")
 	}
@@ -400,7 +400,7 @@ func createWriter(addr string, writeTimeout time.Duration, connectTimeout time.D
 		w, err := newUDSWriter(addr[len(UnixAddressStreamPrefix):], writeTimeout, connectTimeout, "unix")
 		return w, writerNameUDS, err
 	default:
-		w, err := newUDPWriter(addr, writeTimeout)
+		w, err := newUDPWriter(addr, writeTimeout, udpAddrRefreshRate)
 		return w, writerNameUDP, err
 	}
 }
@@ -414,7 +414,7 @@ func NewEx(addr string, options ...Option) (*ClientEx, error) {
 	}
 
 	addr = resolveAddr(addr)
-	w, writerType, err := createWriter(addr, o.writeTimeout, o.connectTimeout)
+	w, writerType, err := createWriter(addr, o.writeTimeout, o.connectTimeout, o.udpAddrRefreshRate)
 	if err != nil {
 		return nil, err
 	}
@@ -560,7 +560,7 @@ func newWithWriter(w Transport, o *Options, writerName string) (*ClientEx, error
 			c.telemetryClient = newTelemetryClient(&c, c.agg != nil)
 		} else {
 			var err error
-			c.telemetryClient, err = newTelemetryClientWithCustomAddr(&c, o.telemetryAddr, c.agg != nil, bufferPool, o.writeTimeout, o.connectTimeout)
+			c.telemetryClient, err = newTelemetryClientWithCustomAddr(&c, o.telemetryAddr, c.agg != nil, bufferPool, o.writeTimeout, o.connectTimeout, o.udpAddrRefreshRate)
 			if err != nil {
 				// Stop the goroutines started above and close the transport.
 				c.Close()
