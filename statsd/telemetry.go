@@ -139,10 +139,10 @@ func newTelemetryClient(c *ClientEx, aggregationEnabled bool) *telemetryClient {
 }
 
 func newTelemetryClientWithCustomAddr(c *ClientEx, telemetryAddr string, aggregationEnabled bool, pool *bufferPool,
-	writeTimeout time.Duration, connectTimeout time.Duration,
+	writeTimeout time.Duration, connectTimeout time.Duration, udpAddrRefreshRate time.Duration,
 ) (*telemetryClient, error) {
 	telemetryAddr = resolveAddr(telemetryAddr)
-	telemetryWriter, _, err := createWriter(telemetryAddr, writeTimeout, connectTimeout)
+	telemetryWriter, _, err := createWriter(telemetryAddr, writeTimeout, connectTimeout, udpAddrRefreshRate)
 	if err != nil {
 		return nil, fmt.Errorf("Could not resolve telemetry address: %v", err)
 	}
