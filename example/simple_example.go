@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/DataDog/datadog-go/v5/statsd"
+	"github.com/blakearnold/datadog-go/statsd"
 )
 
 func main() {
